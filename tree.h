@@ -12,6 +12,7 @@ typedef struct Node {
     int num_children;
 } Node;
 
+
 // Fonction pour créer un nouveau nœud
 Node* createNode(int value, int move, int num_children);
 
@@ -29,5 +30,12 @@ void freeTree(Node* root);
 
 // Fonction pour afficher l'arbre avec indentation et des branches
 void printTree(Node* node, int depth);
+
+
+// Fonction auxiliaire pour trouver la feuille avec la valeur minimale
+void findMinLeafHelper(Node* node, Node** minLeaf, int* minValue);
+
+// trouve le chemin associé a la feuille avec la valeur minimal
+int findPathToLeaf(Node* root, Node* target, Node* path[], int* pathLength);
 
 #endif  // UNTITLED1_TREE_H
