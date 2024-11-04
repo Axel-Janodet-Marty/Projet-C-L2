@@ -6,15 +6,19 @@
 #define UNTITLED1_TREE_H
 
 typedef struct Node {
-    int value;
-    int move;
-    struct Node** children;
-    int num_children;
+    int value;              // Valeur de la case atteinte après un mouvement
+    int move;               // Mouvement associé
+    struct Node** children; // Enfants du nœud
+    int num_children;       // Nombre d'enfants
 } Node;
 
 
+int countLeaves(Node* root);
+int countNodes(Node* root);
+int calculateNumMoves(int depth);
+
 // Fonction pour créer un nouveau nœud
-Node* createNode(int value, int move, int num_children);
+Node* createNode(int value, int move);
 
 // Fonction pour construire l'arbre
 void buildTree(Node* root, int depth, int max_depth, int* moves, int num_moves);
