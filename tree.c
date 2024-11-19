@@ -103,6 +103,48 @@ void printTree(Node* node, int depth) {
     }
 }
 
+/*FONCTION PRINT MAIS ATTENDEZ J'AI PAS ENCORE FINI LA NOUVELLE VERSION DE NOTRE BUILD TREE DONC ON DOIT ENCORE UTILISER L'ANCIENNE MAIS CELLE LA FONCTIONNE BIEN POUR LE NOUVEAU NODETREE
+void printTree(t_node *node, int *architecture, int depth) {
+    if (!node) return; // Vérifie si le nœud est NULL
+
+    // Affiche les espaces pour indenter correctement l'arbre
+    for (int i = 0; i < depth; i++) {
+        if (architecture[i]) {
+            printf("|   ");
+        } else {
+            printf("    ");
+        }
+    }
+
+    // Détermine si c'est le dernier fils
+    int sonsPass = 0;
+    for (int i = 0; i < node->depth; i++) {
+        if (node->sons[i] != NULL) {
+            sonsPass++;
+        }
+    }
+
+    // Affichage de la structure de l'arbre
+    if (sonsPass + 1 == node->nbSons) {
+        printf("`-- %d\n", node->value);
+        architecture[depth] = 0;
+    } else {
+        printf("|-- %d\n", node->value);
+        architecture[depth] = 1;
+    }
+
+    // Récursion pour afficher les fils
+    for (int i = 0; i < node->nbSons; i++) {
+        if (node->sons[i] != NULL) {
+            printTree(node->sons[i], architecture, depth + 1);
+        }
+    }
+}
+
+
+
+    */
+
 // Fonction pour créer un nœud
 Node* createNode(int value, int move) {
     Node* newNode = (Node*)malloc(sizeof(Node));
