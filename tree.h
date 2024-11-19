@@ -17,7 +17,7 @@ int countLeaves(Node* root);
 int countNodes(Node* root);
 int calculateNumMoves(int depth);
 t_move* generate_random_moves();
-
+//void printTree(t_node *node, int *architecture, int depth);
 // Fonction pour créer un nouveau nœud
 Node* createNode(int value, int move);
 
