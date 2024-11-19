@@ -3,7 +3,25 @@
 #include <limits.h>
 #include "tree.h"
 
+
+
+t_move* generate_random_moves() {
+    srand(time(NULL)); // Initialisation du générateur de nombres aléatoires
+    t_move* random_moves = (t_move*) malloc(MAX_CHOICES * sizeof(t_move)); // Allocation d'un tableau pour les mouvements
+
+    for (int idx = 0; idx < MAX_CHOICES; idx++) {
+        int random_number = rand() % 7; // Génère un nombre entre 0 et 6
+
+        // Associe le mouvement correspondant au nombre aléatoire
+        random_moves[idx] = (t_move[]){F_10, F_20, F_30, B_10, T_LEFT, T_RIGHT, U_TURN}[random_number];
+    }
+
+    return random_moves;
+}
+
 // Fonction pour compter le nombre de feuilles dans l'arbre
+
+
 int countLeaves(Node* root) {
     if (root == NULL) {
         return 0;
