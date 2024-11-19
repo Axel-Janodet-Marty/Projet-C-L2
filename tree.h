@@ -16,6 +16,7 @@ typedef struct Node {
 int countLeaves(Node* root);
 int countNodes(Node* root);
 int calculateNumMoves(int depth);
+t_move* generate_random_moves();
 
 // Fonction pour créer un nouveau nœud
 Node* createNode(int value, int move);
