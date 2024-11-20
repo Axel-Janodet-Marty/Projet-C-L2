@@ -53,8 +53,19 @@ t_localisation move(t_localisation, t_move);
  */
 void updateLocalisation(t_localisation *, t_move);
 
+/**
+ * @brief génère des mouvements au hasard
+ * @param int : Nombre de mouvements à générer
+ * @return t_move tableau de mouvements tirés au hazard
+ */
 t_move *getRandomMoves(int );
-
+/**
+ * @brief Met à jour la liste des mouvements disponibles
+ * @param t_move* : tableau de mouvements
+ * @param int : taille
+ * @param int : index du mouvement utilisé
+ * @return t_move tableau de mouvements tirés au hazard
+ */
 t_move* update_movesList(t_move* , int , int );
 
 #endif //UNTITLED1_MOVES_H
