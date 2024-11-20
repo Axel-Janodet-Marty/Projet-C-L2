@@ -5,42 +5,50 @@
 #ifndef UNTITLED1_TREE_H
 #define UNTITLED1_TREE_H
 
-typedef struct Node {
-    int value;              // Valeur de la case atteinte après un mouvement
-    int move;               // Mouvement associé
-    struct Node** children; // Enfants du nœud
-    int num_children;       // Nombre d'enfants
-} Node;
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "stack.h"
+#include "map.h"
+#include "moves.h"
 
 
-int countLeaves(Node* root);
-int countNodes(Node* root);
-int calculateNumMoves(int depth);
-t_move* generate_random_moves();
-//void printTree(t_node *node, int *architecture, int depth);
-// Fonction pour créer un nouveau nœud
-Node* createNode(int value, int move);
-
-// Fonction pour construire l'arbre
-void buildTree(Node* root, int depth, int max_depth, int* moves, int num_moves);
-
-// Fonction pour trouver la feuille avec la valeur minimale
-Node* findMinLeaf(Node* root);
-
-// Fonction pour trouver le chemin de la racine vers une feuille spécifique
-int findPath(Node* root, Node* target, int path[], int pathLength);
-
-// Fonction pour libérer la mémoire de l'arbre
-void freeTree(Node* root);
-
-// Fonction pour afficher l'arbre avec indentation et des branches
-void printTree(Node* node, int depth);
 
 
-// Fonction auxiliaire pour trouver la feuille avec la valeur minimale
-void findMinLeafHelper(Node* node, Node** minLeaf, int* minValue);
+typedef struct s_node
+{
+    int value; // cout de la case actuelle
+    int depth; // Profondeur des racines de l'aarbre
+    t_move move; // Mouvement fait pour arriver à cette case (à été utilisée pour la recostitution des mouvements )
+    struct s_node *parent; // Node d'avant (à été utilisée pour retrouver le chemin min)
+    struct s_node **sons; // Node apres
+    int nbSons; // Qui veut aussi dire la taille de l'arbre
+} t_node;
 
-// trouve le chemin associé a la feuille avec la valeur minimal
-int findPathToLeaf(Node* root, Node* target, Node* path[], int* pathLength);
+typedef struct s_node t_node, *p_node;
 
-#endif  // UNTITLED1_TREE_H
+
+t_node* find_best_min(t_node* );
+
+void print_moves(t_move* , int );
+
+t_move* get_moves_from_start(t_node* , int* );
+
+void explore(t_node* , t_node** , int* , int* );
+
+p_node Init_Node(int , int , t_move , t_localisation , t_map , p_node );
+
+void printTree(t_node *, int *, int );
+
+p_node BuildTree(int , int , t_move , t_move* , t_localisation , t_map , p_node );
+
+int search_min(t_node *);
+
+
+
+
+
+
+
+#endif //UNTITLED1_TREE_H
+
