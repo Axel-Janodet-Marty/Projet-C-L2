@@ -1,5 +1,5 @@
 # **Projet MARC - Navigation du Rover**
-*{SKANDER HAMDOUNI, AXEL JANODET-MARTY, SAMI BENABDALLAH}*
+*{SKANDER HAMDOUNI, AXEL JANODET--MARTY, SAMI BENABDALLAH}*
 
 ## **Objectif du projet Rover MARC**
 Permettre à Marc de retourner à sa base malgré des restrictions sur les mouvements.
