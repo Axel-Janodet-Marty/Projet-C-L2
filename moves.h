@@ -7,6 +7,8 @@
 
 #include "loc.h"
 
+#define NB_tab_moves 9
+#define NB_choices 5
 /**
  * @brief Array of strings for the possible moves of the robot
  */
@@ -24,7 +26,8 @@ typedef enum e_move
     B_10, // Backward 10 m
     T_LEFT, // Turn left (+90°)
     T_RIGHT, // Turn right (-90°)
-    U_TURN
+    U_TURN, // +-180°
+    INITIAL_POS
 } t_move;
 
 /**
@@ -49,5 +52,9 @@ t_localisation move(t_localisation, t_move);
  * @return none
  */
 void updateLocalisation(t_localisation *, t_move);
+
+t_move *getRandomMoves(int );
+
+t_move* update_movesList(t_move* , int , int );
 
 #endif //UNTITLED1_MOVES_H
