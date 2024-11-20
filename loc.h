@@ -5,6 +5,9 @@
 #ifndef UNTITLED1_LOC_H
 #define UNTITLED1_LOC_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /**
  * @brief Enum for the orientation of the robot (NORTH, EAST, SOUTH, WEST)
  */
@@ -79,5 +82,7 @@ t_position UP(t_position);
  * @return the DOWN position
  */
 t_position DOWN(t_position);
+
+void checkWin(int );
 
 #endif //UNTITLED1_LOC_H
