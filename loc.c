@@ -50,3 +50,11 @@ t_position DOWN(t_position pos)
     return new_pos;
 }
 
+void checkWin(int min){
+    if (min==0){
+        printf("Marc est rentré à la base, Terminé...\n");
+    }
+    else{
+        printf("Contact perdu avec Marc, Terminé...\n");
+    }
+}
