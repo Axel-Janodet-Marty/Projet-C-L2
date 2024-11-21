@@ -117,9 +117,3 @@ int search_min(t_node* node);
 
 
 
-
-
-
-
-#endif //UNTITLED1_TREE_H
-
