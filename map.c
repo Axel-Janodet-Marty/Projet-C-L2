@@ -35,6 +35,53 @@ void removeFalseCrevasses(t_map);
 
 /* definition of local functions */
 
+
+t_map generateRandomMap(int xdim, int ydim)
+{
+    t_map map;
+    map.x_max = xdim;
+    map.y_max = ydim;
+
+    // Allocation de mémoire pour la carte
+    map.soils = (t_soil **)malloc(ydim * sizeof(t_soil *));
+    for (int i = 0; i < ydim; i++)
+    {
+        map.soils[i] = (t_soil *)malloc(xdim * sizeof(t_soil));
+    }
+    map.costs = (int **)malloc(ydim * sizeof(int *));
+    for (int i = 0; i < ydim; i++)
+    {
+        map.costs[i] = (int *)malloc(xdim * sizeof(int));
+    }
+
+    // Initialiser le générateur aléatoire
+    srand(time(NULL));
+
+    // Génération des sols
+    for (int i = 0; i < ydim; i++)
+    {
+        for (int j = 0; j < xdim; j++)
+        {
+            // Valeurs possibles : 1 (PLAIN) à 4 (CREVASSE)
+            map.soils[i][j] = rand() % 4 + 1; // Limiter les valeurs entre 1 et 4
+            map.costs[i][j] = COST_UNDEF;    // Coût par défaut pour toutes les cases
+        }
+    }
+
+    // Placement de la base station
+    int base_x = rand() % xdim;
+    int base_y = rand() % ydim;
+    map.soils[base_y][base_x] = BASE_STATION; // Valeur de la base station
+    map.costs[base_y][base_x] = 0;           // Coût de la base station est 0
+
+    // Calcul des coûts et suppression des crevasses incorrectes
+    calculateCosts(map);
+    removeFalseCrevasses(map);
+
+    return map;
+}
+
+
 t_position getBaseStationPosition(t_map map)
 {
     t_position pos;
