@@ -15,8 +15,8 @@ void afficherMenu() {
     printf("5. Rechercher la feuille de valeur minimale\n");
     printf("6. Calculer le chemin vers la feuille minimale\n");
     printf("7. Rapport sur la situation\n");
-    printf("8. Afficher l'arbre entier\n"); // Nouvelle option
-    printf("9. Passer en interface graphique\n"); // Nouvelle option
+    printf("8. Afficher l'arbre entier\n");
+    printf("9. Passer en interface graphique\n");
     printf("10. Quitter\n");
     printf("Votre choix : ");
 }
@@ -46,12 +46,20 @@ int main() {
         map = createMapFromFile(filename);
     } else if (choice == 2) {
         int xdim, ydim;
-        printf("Entrez les dimensions de la carte (xdim) :\n");
+        printf("Entrez les dimensions de la carte (xdim) : ");
         fgets(buffer, sizeof(buffer), stdin);
-        sscanf(buffer, "%d", &xdim);
-        printf("Entrez les dimensions de la carte (ydim) :\n");
+        if (sscanf(buffer, "%d", &xdim) != 1 || xdim <= 0) {
+            fprintf(stderr, "Erreur : dimension invalide pour xdim\n");
+            return 1;
+        }
+
+        printf("Entrez les dimensions de la carte (ydim) : ");
         fgets(buffer, sizeof(buffer), stdin);
-        sscanf(buffer, "%d", &ydim);
+        if (sscanf(buffer, "%d", &ydim) != 1 || ydim <= 0) {
+            fprintf(stderr, "Erreur : dimension invalide pour ydim\n");
+            return 1;
+        }
+
         map = generateRandomMap(xdim, ydim);
     } else {
         printf("Choix invalide.\n");
@@ -183,7 +191,6 @@ int main() {
 
             case 9: // Passer en interface graphique
                 printf("--> Interface graphique (non implémentée pour le moment).\n");
-                // Code à ajouter ultérieurement
                 break;
 
             case 10: // Quitter
