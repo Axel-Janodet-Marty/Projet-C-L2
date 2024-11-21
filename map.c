@@ -42,39 +42,60 @@ t_map generateRandomMap(int xdim, int ydim)
     map.x_max = xdim;
     map.y_max = ydim;
 
-    // Allocation de mémoire pour la carte
+    // Allocation de mémoire pour les sols
     map.soils = (t_soil **)malloc(ydim * sizeof(t_soil *));
-    for (int i = 0; i < ydim; i++)
-    {
+    if (map.soils == NULL) {
+        fprintf(stderr, "Erreur : allocation mémoire échouée pour map.soils\n");
+        exit(1);
+    }
+    for (int i = 0; i < ydim; i++) {
         map.soils[i] = (t_soil *)malloc(xdim * sizeof(t_soil));
-    }
-    map.costs = (int **)malloc(ydim * sizeof(int *));
-    for (int i = 0; i < ydim; i++)
-    {
-        map.costs[i] = (int *)malloc(xdim * sizeof(int));
-    }
-
-    // Initialiser le générateur aléatoire
-    srand(time(NULL));
-
-    // Génération des sols
-    for (int i = 0; i < ydim; i++)
-    {
-        for (int j = 0; j < xdim; j++)
-        {
-            // Valeurs possibles : 1 (PLAIN) à 4 (CREVASSE)
-            map.soils[i][j] = rand() % 4 + 1; // Limiter les valeurs entre 1 et 4
-            map.costs[i][j] = COST_UNDEF;    // Coût par défaut pour toutes les cases
+        if (map.soils[i] == NULL) {
+            fprintf(stderr, "Erreur : allocation mémoire échouée pour map.soils[%d]\n", i);
+            exit(1);
         }
+    }
+
+    // Allocation de mémoire pour les coûts
+    map.costs = (int **)malloc(ydim * sizeof(int *));
+    if (map.costs == NULL) {
+        fprintf(stderr, "Erreur : allocation mémoire échouée pour map.costs\n");
+        exit(1);
+    }
+    for (int i = 0; i < ydim; i++) {
+        map.costs[i] = (int *)malloc(xdim * sizeof(int));
+        if (map.costs[i] == NULL) {
+            fprintf(stderr, "Erreur : allocation mémoire échouée pour map.costs[%d]\n", i);
+            exit(1);
+        }
+    }
+
+    // Initialisation aléatoire
+    srand(time(NULL));
+    int accessible = 0; // Vérifie si la carte est navigable
+    for (int i = 0; i < ydim; i++) {
+        for (int j = 0; j < xdim; j++) {
+            map.soils[i][j] = rand() % 4 + 1; // Valeurs aléatoires entre 1 et 4
+            map.costs[i][j] = COST_UNDEF;    // Coût par défaut
+            if (map.soils[i][j] != CREVASSE) {
+                accessible = 1; // Au moins une case accessible
+            }
+        }
+    }
+
+    // Vérification de navigabilité
+    if (!accessible) {
+        fprintf(stderr, "Erreur : la carte générée est entièrement composée de crevasses.\n");
+        exit(1);
     }
 
     // Placement de la base station
     int base_x = rand() % xdim;
     int base_y = rand() % ydim;
-    map.soils[base_y][base_x] = BASE_STATION; // Valeur de la base station
-    map.costs[base_y][base_x] = 0;           // Coût de la base station est 0
+    map.soils[base_y][base_x] = BASE_STATION;
+    map.costs[base_y][base_x] = 0;
 
-    // Calcul des coûts et suppression des crevasses incorrectes
+    // Calcul des coûts et suppression des faux crevasses
     calculateCosts(map);
     removeFalseCrevasses(map);
 
@@ -113,17 +134,17 @@ t_position getBaseStationPosition(t_map map)
 
 void removeFalseCrevasses(t_map map)
 {
-    // step 1 : find the minimal cost > 10000 in the costs array where the soil is not a crevasse
-    int over=0;
-    int imin, jmin;
+    int over = 0;
+
     while (!over)
     {
         int min_cost = COST_UNDEF;
-        imin = map.y_max;
-        jmin = map.x_max;
-        for (int i=0; i<map.y_max; i++)
+        int imin = -1, jmin = -1;
+
+        // Trouver la position avec le coût minimum valide (> 10000) et pas une crevasse
+        for (int i = 0; i < map.y_max; i++)
         {
-            for (int j=0; j<map.x_max; j++)
+            for (int j = 0; j < map.x_max; j++)
             {
                 if (map.soils[i][j] != CREVASSE && map.costs[i][j] > 10000 && map.costs[i][j] < min_cost)
                 {
@@ -133,110 +154,91 @@ void removeFalseCrevasses(t_map map)
                 }
             }
         }
-        if (imin < map.y_max && jmin < map.x_max)
+
+        // Si aucune position valide n'a été trouvée, la boucle peut s'arrêter
+        if (imin == -1 || jmin == -1)
         {
-            // step 2 : calculate the costs of the neighbours of the position
-            t_position pos;
-            pos.x = jmin;
-            pos.y = imin;
-            t_position lp, rp, up, dp;
-            lp = LEFT(pos);
-            rp = RIGHT(pos);
-            up = UP(pos);
-            dp = DOWN(pos);
-            int min_neighbour = COST_UNDEF;
-            if (isValidLocalisation(lp, map.x_max, map.y_max))
-            {
-                min_neighbour = (map.costs[lp.y][lp.x] < min_neighbour) ? map.costs[lp.y][lp.x] : min_neighbour;
-            }
-            if (isValidLocalisation(rp, map.x_max, map.y_max))
-            {
-                min_neighbour = (map.costs[rp.y][rp.x] < min_neighbour) ? map.costs[rp.y][rp.x] : min_neighbour;
-            }
-            if (isValidLocalisation(up, map.x_max, map.y_max))
-            {
-                min_neighbour = (map.costs[up.y][up.x] < min_neighbour) ? map.costs[up.y][up.x] : min_neighbour;
-            }
-            if (isValidLocalisation(dp, map.x_max, map.y_max))
-            {
-                min_neighbour = (map.costs[dp.y][dp.x] < min_neighbour) ? map.costs[dp.y][dp.x] : min_neighbour;
-            }
-            int self_cost = _soil_cost[map.soils[imin][jmin]];
-            map.costs[imin][jmin] = (min_neighbour + self_cost < map.costs[imin][jmin]) ? min_neighbour + self_cost : map.costs[imin][jmin];
+            over = 1;
+            continue;
+        }
+
+        // Calculer les coûts des voisins de cette position
+        t_position pos = {jmin, imin};
+        t_position lp = LEFT(pos), rp = RIGHT(pos), up = UP(pos), dp = DOWN(pos);
+        int min_neighbour = COST_UNDEF;
+
+        if (isValidLocalisation(lp, map.x_max, map.y_max))
+            min_neighbour = (map.costs[lp.y][lp.x] < min_neighbour) ? map.costs[lp.y][lp.x] : min_neighbour;
+
+        if (isValidLocalisation(rp, map.x_max, map.y_max))
+            min_neighbour = (map.costs[rp.y][rp.x] < min_neighbour) ? map.costs[rp.y][rp.x] : min_neighbour;
+
+        if (isValidLocalisation(up, map.x_max, map.y_max))
+            min_neighbour = (map.costs[up.y][up.x] < min_neighbour) ? map.costs[up.y][up.x] : min_neighbour;
+
+        if (isValidLocalisation(dp, map.x_max, map.y_max))
+            min_neighbour = (map.costs[dp.y][dp.x] < min_neighbour) ? map.costs[dp.y][dp.x] : min_neighbour;
+
+        // Mettre à jour le coût de la case actuelle
+        int self_cost = _soil_cost[map.soils[imin][jmin]];
+        int new_cost = min_neighbour + self_cost;
+
+        // Vérification pour éviter les cycles
+        if (new_cost < map.costs[imin][jmin])
+        {
+            map.costs[imin][jmin] = new_cost;
         }
         else
         {
-            over = 1;
+            over = 1; // Arrêt si aucune mise à jour n'est possible
         }
     }
 }
 
 void calculateCosts(t_map map)
 {
+    // Obtenir la position de la station de base
     t_position baseStation = getBaseStationPosition(map);
-    //create a queue to store the positions to visit
+
+    // Créer une file pour gérer les positions à visiter
     t_queue queue = createQueue(map.x_max * map.y_max);
-    //enqueue the base station
+
+    // Ajouter la station de base à la file
     enqueue(&queue, baseStation);
-    // while the queue is not empty
+
+    // Tant que la file n'est pas vide
     while (queue.first != queue.last)
     {
-        // dequeue the position
+        // Extraire la position courante
         t_position pos = dequeue(&queue);
-        // get its self cost
+
+        // Récupérer le coût propre à cette case
         int self_cost = _soil_cost[map.soils[pos.y][pos.x]];
-        // get ts neighbours
-        t_position lp, rp, up, dp;
-        lp = LEFT(pos);
-        rp = RIGHT(pos);
-        up = UP(pos);
-        dp = DOWN(pos);
-        // get the mimimum cost of the neighbours
-        int min_cost = COST_UNDEF;
-        if (isValidLocalisation(lp, map.x_max, map.y_max))
+
+        // Définir les voisins de la position actuelle
+        t_position lp = LEFT(pos), rp = RIGHT(pos), up = UP(pos), dp = DOWN(pos);
+        t_position neighbors[4] = {lp, rp, up, dp};
+
+        // Parcourir les voisins
+        for (int k = 0; k < 4; k++)
         {
-            min_cost = (map.costs[lp.y][lp.x] < min_cost) ? map.costs[lp.y][lp.x] : min_cost;
-        }
-        if (isValidLocalisation(rp, map.x_max, map.y_max))
-        {
-            min_cost = (map.costs[rp.y][rp.x] < min_cost) ? map.costs[rp.y][rp.x] : min_cost;
-        }
-        if (isValidLocalisation(up, map.x_max, map.y_max))
-        {
-            min_cost = (map.costs[up.y][up.x] < min_cost) ? map.costs[up.y][up.x] : min_cost;
-        }
-        if (isValidLocalisation(dp, map.x_max, map.y_max))
-        {
-            min_cost = (map.costs[dp.y][dp.x] < min_cost) ? map.costs[dp.y][dp.x] : min_cost;
-        }
-        // the cost of the current position is the minimum cost of the neighbours + 1 or 0 if the soil is a base station
-        map.costs[pos.y][pos.x] = (map.soils[pos.y][pos.x] == BASE_STATION) ? 0 : min_cost + self_cost;
-        // enqueue the neighbours if they are not visited yet
-        if (isValidLocalisation(lp, map.x_max, map.y_max) && map.costs[lp.y][lp.x] == COST_UNDEF)
-        {
-            // mark as visited - change the cost to 65534
-            map.costs[lp.y][lp.x] = COST_UNDEF-1;
-            enqueue(&queue, lp);
-        }
-        if (isValidLocalisation(rp, map.x_max, map.y_max) && map.costs[rp.y][rp.x] == COST_UNDEF)
-        {
-            map.costs[rp.y][rp.x] = COST_UNDEF-1;
-            enqueue(&queue, rp);
-        }
-        if (isValidLocalisation(up, map.x_max, map.y_max) && map.costs[up.y][up.x] == COST_UNDEF)
-        {
-            map.costs[up.y][up.x] = COST_UNDEF-1;
-            enqueue(&queue, up);
-        }
-        if (isValidLocalisation(dp, map.x_max, map.y_max) && map.costs[dp.y][dp.x] == COST_UNDEF)
-        {
-            map.costs[dp.y][dp.x] = COST_UNDEF-1;
-            enqueue(&queue, dp);
+            t_position neighbor = neighbors[k];
+
+            // Vérifier si le voisin est dans les limites
+            if (isValidLocalisation(neighbor, map.x_max, map.y_max))
+            {
+                int current_cost = map.costs[neighbor.y][neighbor.x];
+                int new_cost = map.costs[pos.y][pos.x] + _soil_cost[map.soils[neighbor.y][neighbor.x]];
+
+                // Mettre à jour le coût si nécessaire
+                if (current_cost == COST_UNDEF || new_cost < current_cost)
+                {
+                    map.costs[neighbor.y][neighbor.x] = new_cost;
+                    enqueue(&queue, neighbor);
+                }
+            }
         }
     }
-
-
-    return;
 }
 /* definition of exported functions */
 
