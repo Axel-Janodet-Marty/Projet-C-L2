@@ -39,11 +39,12 @@ int main() {
     sscanf(buffer, "%d", &choice);
 
     if (choice == 1) {
-        char filename[256];
-        printf("Entrez le chemin du fichier de la carte : ");
+        char filename[256], mapPath[256] ;
+        printf("Entrez le nom de la carte (sans .map) : ");
         fgets(filename, sizeof(filename), stdin);
         filename[strcspn(filename, "\n")] = '\0';
-        map = createMapFromFile(filename);
+        snprintf(mapPath, sizeof(mapPath), "..\\maps\\%s.map", filename);
+        map = createMapFromFile(mapPath);
     } else if (choice == 2) {
         int xdim, ydim;
         printf("Entrez les dimensions de la carte (xdim) : ");
