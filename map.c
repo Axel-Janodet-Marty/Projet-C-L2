@@ -8,6 +8,7 @@
 #include "map.h"
 #include "loc.h"
 #include "queue.h"
+#include <time.h>
 
 /* prototypes of local functions */
 /* local functions are used only in this file, as helper functions */
