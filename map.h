@@ -54,5 +54,6 @@ t_map createMapFromFile(char *);
  * @param map : the map to display
  */
 void displayMap(t_map);
+t_map generateRandomMap(int xdim, int ydim);
 
 #endif //UNTITLED1_MAP_H
