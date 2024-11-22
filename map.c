@@ -358,7 +358,7 @@ void displayMap(t_map map)
                         strcpy(c, "^^^");
                         break;
                     case CREVASSE:
-                        sprintf(c, "%c%c%c",219,219,219);
+                        sprintf(c, "###");
                         break;
                     default:
                         strcpy(c, "???");
