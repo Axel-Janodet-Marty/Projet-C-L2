@@ -70,52 +70,52 @@ t_map generateRandomMap(int xdim, int ydim) {
         }
     }
 
-    // Initialisation des compteurs pour les types de sols
-    int crevasse_count = 0;
-    int plain_count = 0;
-    int erg_count = 0;
-    int reg_count = 0;
-    int max_crevasses = 5;
+    // Dimensions totales
+    int total_cells = xdim * ydim;
 
+    // Calculer les quantités de chaque type de sol
+    int max_crevasses = 5;
+    int crevasse_count = (total_cells > max_crevasses) ? max_crevasses : total_cells / 10; // Max 5 ou 10% des cases
+    int plain_count = total_cells / 2; // 50% de plaines
+    int erg_reg_count = (total_cells - plain_count - crevasse_count) / 2; // Le reste pour ergs et regs
+
+    // Création d'une liste aléatoire de sols
+    t_soil *shuffled_soils = (t_soil *)malloc(total_cells * sizeof(t_soil));
+    if (shuffled_soils == NULL) {
+        fprintf(stderr, "Erreur : allocation mémoire échouée pour shuffled_soils\n");
+        exit(1);
+    }
+
+    // Ajouter les types de sols en respectant les quantités
+    for (int i = 0; i < crevasse_count; i++) shuffled_soils[i] = CREVASSE;
+    for (int i = crevasse_count; i < crevasse_count + plain_count; i++) shuffled_soils[i] = PLAIN;
+    for (int i = crevasse_count + plain_count; i < crevasse_count + plain_count + erg_reg_count; i++) shuffled_soils[i] = ERG;
+    for (int i = crevasse_count + plain_count + erg_reg_count; i < total_cells; i++) shuffled_soils[i] = REG;
+
+    // Mélanger les sols
     srand(time(NULL));
+    for (int i = total_cells - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        t_soil temp = shuffled_soils[i];
+        shuffled_soils[i] = shuffled_soils[j];
+        shuffled_soils[j] = temp;
+    }
+
+    // Remplir la carte avec les sols mélangés
     for (int i = 0; i < ydim; i++) {
         for (int j = 0; j < xdim; j++) {
-            int soil_type;
-
-            // Génération contrôlée des types de sols
-            do {
-                soil_type = rand() % 4 + 1; // Valeurs aléatoires entre 1 et 4
-                if (soil_type == CREVASSE && crevasse_count >= max_crevasses) {
-                    soil_type = PLAIN; // Forcer une plaine si trop de crevasses
-                }
-                if (plain_count >= 2 * (erg_count + reg_count)) {
-                    if (soil_type == PLAIN) soil_type = rand() % 3 + 2; // Limiter les plaines
-                }
-            } while ((soil_type == CREVASSE && crevasse_count >= max_crevasses));
-
-            // Mise à jour des compteurs
-            map.soils[i][j] = soil_type;
-            if (soil_type == CREVASSE) crevasse_count++;
-            if (soil_type == PLAIN) plain_count++;
-            if (soil_type == ERG) erg_count++;
-            if (soil_type == REG) reg_count++;
-
-            // Coût par défaut
-            map.costs[i][j] = COST_UNDEF;
+            map.soils[i][j] = shuffled_soils[i * xdim + j];
+            map.costs[i][j] = COST_UNDEF; // Coût par défaut
         }
     }
+
+    free(shuffled_soils);
 
     // Placement de la base station
     int base_x = rand() % xdim;
     int base_y = rand() % ydim;
     map.soils[base_y][base_x] = BASE_STATION;
     map.costs[base_y][base_x] = 0;
-
-    // Vérification de navigabilité
-    if (crevasse_count == xdim * ydim) {
-        fprintf(stderr, "Erreur : la carte générée est entièrement composée de crevasses.\n");
-        exit(1);
-    }
 
     // Calcul des coûts et suppression des faux crevasses
     calculateCosts(map);
