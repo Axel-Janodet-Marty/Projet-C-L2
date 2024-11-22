@@ -55,5 +55,6 @@ t_map createMapFromFile(char *);
  */
 void displayMap(t_map);
 t_map generateRandomMap(int xdim, int ydim);
+const char* getSoilAsString(t_soil soil);
 
 #endif //UNTITLED1_MAP_H
