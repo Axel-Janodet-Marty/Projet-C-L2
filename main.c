@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "map.h"
-#include "tree.h"
 #include <time.h>
 #include <windows.h>
+#include "map.h"
+#include "tree.h"
 #include "stdbool.h"
 
+// Fonctions auxiliaires
 void afficherMenu() {
     printf("\n--- MENU ---\n");
     printf("1. Afficher la carte (sols et coûts)\n");
@@ -16,12 +17,14 @@ void afficherMenu() {
     printf("6. Calculer le chemin vers la feuille minimale\n");
     printf("7. Rapport sur la situation\n");
     printf("8. Afficher l'arbre entier\n");
-    printf("9. Passer en interface graphique\n");
+    printf("9. Étude de complexité (profondeur et choix)\n");
     printf("10. Quitter\n");
     printf("Votre choix : ");
 }
 
 int main() {
+    int NB_tab_moves = 9;
+    int NB_choices = 5;
     SetConsoleOutputCP(CP_UTF8);
     clock_t start, end;
     double cpu_time_used;
@@ -39,7 +42,7 @@ int main() {
     sscanf(buffer, "%d", &choice);
 
     if (choice == 1) {
-        char filename[256], mapPath[256] ;
+        char filename[256], mapPath[256];
         printf("Entrez le nom de la carte (sans .map) : ");
         fgets(filename, sizeof(filename), stdin);
         filename[strcspn(filename, "\n")] = '\0';
@@ -49,17 +52,11 @@ int main() {
         int xdim, ydim;
         printf("Entrez les dimensions de la carte (xdim) : ");
         fgets(buffer, sizeof(buffer), stdin);
-        if (sscanf(buffer, "%d", &xdim) != 1 || xdim <= 0) {
-            fprintf(stderr, "Erreur : dimension invalide pour xdim\n");
-            return 1;
-        }
+        sscanf(buffer, "%d", &xdim);
 
         printf("Entrez les dimensions de la carte (ydim) : ");
         fgets(buffer, sizeof(buffer), stdin);
-        if (sscanf(buffer, "%d", &ydim) != 1 || ydim <= 0) {
-            fprintf(stderr, "Erreur : dimension invalide pour ydim\n");
-            return 1;
-        }
+        sscanf(buffer, "%d", &ydim);
 
         map = generateRandomMap(xdim, ydim);
     } else {
@@ -70,12 +67,10 @@ int main() {
     printf("\nCarte créée avec dimensions %d x %d\n", map.y_max, map.x_max);
 
     int exit = 0;
-    bool ActiveLoc = FALSE;
+    bool activeLoc = FALSE;
     t_move *test = NULL;
     t_localisation loc;
     t_node *node = NULL;
-    int min_value = 0;
-    t_node *best_min_node = NULL;
 
     while (!exit) {
         afficherMenu();
@@ -85,12 +80,7 @@ int main() {
         switch (choice) {
             case 1: // Afficher la carte
                 printf("Sols :\n");
-                for (int i = 0; i < map.y_max; i++) {
-                    for (int j = 0; j < map.x_max; j++) {
-                        printf("%d ", map.soils[i][j]);
-                    }
-                    printf("\n");
-                }
+                displayMap(map);
                 printf("Coûts :\n");
                 for (int i = 0; i < map.y_max; i++) {
                     for (int j = 0; j < map.x_max; j++) {
@@ -98,8 +88,6 @@ int main() {
                     }
                     printf("\n");
                 }
-                printf("Représentation de la map :\n");
-                displayMap(map);
                 break;
 
             case 2: // Générer des mouvements aléatoires
@@ -113,60 +101,54 @@ int main() {
 
             case 3: // Initialiser la localisation
                 loc = loc_init(0, 0, NORTH);
-                ActiveLoc = TRUE;
-                printf("Position initiale (%d:%d), coût de la case initiale : %d\n", loc.pos.y, loc.pos.x, map.costs[loc.pos.y][loc.pos.x]);
+                activeLoc = TRUE;
+                printf("Position initiale (%d:%d), coût de la case initiale : %d\n",
+                       loc.pos.y, loc.pos.x, map.costs[loc.pos.y][loc.pos.x]);
                 break;
 
             case 4: // Construire l'arbre
-                if (test == NULL) {
-                    printf("Générez d'abord les mouvements aléatoires (option 2).\n");
-                    break;
-                }
-                if (ActiveLoc == FALSE) {
-                    printf("Initialisez d'abord la localisation (option 3).\n");
+                if (!test || !activeLoc) {
+                    printf("Générez des mouvements (2) et initialisez la localisation (3) d'abord.\n");
                     break;
                 }
                 start = clock();
-                node = BuildTree(NB_tab_moves, 0, INITIAL_POS, test, loc, map, NULL);
+                node = BuildTree(NB_choices,NB_tab_moves, 0, INITIAL_POS, test, loc, map, NULL);
                 end = clock();
                 cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
                 printf("--> Temps de construction de l'arbre : %.3f sec\n", cpu_time_used);
                 break;
 
             case 5: // Rechercher la feuille de valeur minimale
-                if (node == NULL) {
+                if (!node) {
                     printf("Construisez d'abord l'arbre (option 4).\n");
                     break;
                 }
                 start = clock();
-                min_value = search_min(node);
+                int min_value = search_min(node);
                 end = clock();
                 cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-                printf("--> Valeur minimale des nodes = %d\n", min_value);
-                printf("--> Temps de recherche de la valeur minimale : %.3f sec\n", cpu_time_used);
+                printf("--> Valeur minimale : %d\n", min_value);
+                printf("--> Temps de recherche : %.3f sec\n", cpu_time_used);
                 break;
 
             case 6: // Calculer le chemin vers la feuille minimale
-                if (node == NULL) {
+                if (!node) {
                     printf("Construisez d'abord l'arbre (option 4).\n");
                     break;
                 }
                 start = clock();
-                best_min_node = find_best_min(node);
+                t_node *best_min_node = find_best_min(node);
                 end = clock();
                 cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-                printf("--> Temps de calcul du meilleur chemin : %.3f sec\n", cpu_time_used);
-
-                if (best_min_node != NULL) {
+                printf("--> Temps de calcul du chemin : %.3f sec\n", cpu_time_used);
+                if (best_min_node) {
                     int move_count;
                     t_move *moves = get_moves_from_start(best_min_node, &move_count);
-
-                    printf("--> Liste des mouvements effectués par MARC :\n");
+                    printf("--> Mouvements :\n");
                     print_moves(moves, move_count);
-
                     free(moves);
                 } else {
-                    printf("--> Aucun meilleur minimum trouvé.\n");
+                    printf("--> Aucun chemin trouvé.\n");
                 }
                 break;
 
@@ -183,17 +165,27 @@ int main() {
                 break;
 
             case 8: // Afficher l'arbre entier
-                if (node == NULL) {
+                if (!node) {
                     printf("Construisez d'abord l'arbre (option 4).\n");
                     break;
                 }
-                printf("--> Affichage de l'arbre entier :\n");
-                int architecture[100] = {0}; // Tableau d'indentation, taille adaptée à la profondeur maximale
-                printTree(node, architecture, 0); // Appel de la fonction avec profondeur initiale 0
+                printf("--> Affichage de l'arbre :\n");
+                int architecture[100] = {0};
+                printTree(node, architecture, 0);
                 break;
 
-            case 9: // Passer en interface graphique
-                printf("--> Interface graphique (non implémentée pour le moment).\n");
+            case 9: // Étude de complexité
+                printf("--> Étude de complexité :\n");
+                for (int Nb_moves = 3; Nb_moves <= NB_tab_moves; Nb_moves++) {
+                    for (int choices = 3; choices <= NB_choices; choices++) {
+                        printf("\nNb_Tirages : %d, N_Choix : %d\n", Nb_moves, choices);
+                        start = clock();
+                        t_node *test_tree = BuildTree(choices,Nb_moves, 0, INITIAL_POS, test, loc, map, NULL);
+                        end = clock();
+                        printf("--> Temps de construction : %.3f sec\n", ((double)(end - start)) / CLOCKS_PER_SEC);
+                        free(test_tree); // Nettoyer l'arbre
+                    }
+                }
                 break;
 
             case 10: // Quitter
@@ -202,12 +194,12 @@ int main() {
                 break;
 
             default:
-                printf("Option invalide. Réessayez.\n");
+                printf("Option invalide.\n");
                 break;
         }
     }
 
-    // Nettoyage
+    // Nettoyage final
     if (node) free(node);
     if (test) free(test);
 
