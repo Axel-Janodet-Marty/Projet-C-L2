@@ -21,7 +21,7 @@ p_node Init_Node(int nb_sons, int depth, t_move move, t_localisation loc, t_map 
     return new_node;
 }
 
-p_node BuildTree(int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent) {
+p_node BuildTree(int NB_choices, int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent) {
     if (depth > NB_choices) {
         return NULL;
     } else if (depth == NB_choices || map.costs[loc.pos.y][loc.pos.x] >= 10000 || map.costs[loc.pos.y][loc.pos.x] == 0) {
@@ -48,7 +48,7 @@ p_node BuildTree(int NB_Moves, int depth, t_move move, t_move* tab_moves, t_loca
 
         if (isValidLocalisation(new_loc.pos, map.x_max, map.y_max)) {
             t_move* new_tab_moves = update_movesList(tab_moves, NB_Moves, i);
-            node->sons[i] = BuildTree(NB_Moves - 1, depth + 1, adapted_move, new_tab_moves, new_loc, map, node);
+            node->sons[i] = BuildTree(NB_choices,NB_Moves - 1, depth + 1, adapted_move, new_tab_moves, new_loc, map, node);
             free(new_tab_moves);
         } else {
             node->sons[i] = NULL;
