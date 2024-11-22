@@ -67,7 +67,7 @@ int main() {
         return 1;
     }
 
-    printf("Carte créée avec dimensions %d x %d\n", map.y_max, map.x_max);
+    printf("\nCarte créée avec dimensions %d x %d\n", map.y_max, map.x_max);
 
     int exit = 0;
     bool ActiveLoc = FALSE;
