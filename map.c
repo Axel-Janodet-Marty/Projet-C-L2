@@ -125,6 +125,7 @@ t_map generateRandomMap(int xdim, int ydim) {
 }
 
 
+
 t_position getBaseStationPosition(t_map map)
 {
     t_position pos;
@@ -369,6 +370,10 @@ void displayMap(t_map map)
             printf("\n");
         }
 
+    }
+    return;
+}
+
 const char* getSoilAsString(t_soil soil) {
     switch (soil) {
         case BASE_STATION:
@@ -384,8 +389,4 @@ const char* getSoilAsString(t_soil soil) {
         default:
             return "Unknown Soil";
     }
-}
-
-    }
-    return;
 }
