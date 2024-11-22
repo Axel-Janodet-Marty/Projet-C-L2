@@ -97,7 +97,7 @@ void printTree(t_node* node, int* architecture, int depth);
  * @param p_node parent : Pointeur vers le parent du nœud courant.
  * @return p_node : Pointeur vers la racine de l'arbre construit.
  */
-p_node BuildTree(int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent);
+p_node BuildTree(int NB_choices, int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent);
 
 
 /**
