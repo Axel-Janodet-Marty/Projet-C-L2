@@ -67,5 +67,6 @@ t_move *getRandomMoves(int );
  * @return t_move tableau de mouvements tirés au hazard
  */
 t_move* update_movesList(t_move* , int , int );
+t_move ErgMove(t_move move);
 
 #endif //UNTITLED1_MOVES_H
