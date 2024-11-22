@@ -23,6 +23,7 @@ typedef struct s_node
     struct s_node *parent; // Node d'avant (à été utilisée pour retrouver le chemin min)
     struct s_node **sons; // Node apres
     int nbSons; // Qui veut aussi dire la taille de l'arbre
+    t_soil soil; // Type de sol
 } t_node;
 
 typedef struct s_node t_node, *p_node;
