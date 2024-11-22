@@ -98,6 +98,8 @@ int main() {
                     }
                     printf("\n");
                 }
+                printf("Représentation de la map :\n");
+                displayMap(map);
                 break;
 
             case 2: // Générer des mouvements aléatoires
