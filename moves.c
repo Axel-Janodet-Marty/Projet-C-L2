@@ -196,3 +196,24 @@ t_move *getRandomMoves(int N)
     }
     return moves;
 }
+
+t_move ErgMove(t_move move){
+    switch (move) {
+        case F_10:
+            return F_10;
+        case F_20:
+            return F_10;
+        case F_30:
+            return F_20;
+        case B_10:
+            return B_10;
+        case T_LEFT:
+            return T_LEFT;
+        case T_RIGHT:
+            return T_RIGHT;
+        case U_TURN:
+            return T_LEFT;
+        default:
+            return move;
+    }
+}
