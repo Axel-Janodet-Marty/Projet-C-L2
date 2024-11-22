@@ -37,8 +37,7 @@ void removeFalseCrevasses(t_map);
 /* definition of local functions */
 
 
-t_map generateRandomMap(int xdim, int ydim)
-{
+t_map generateRandomMap(int xdim, int ydim) {
     t_map map;
     map.x_max = xdim;
     map.y_max = ydim;
@@ -71,23 +70,39 @@ t_map generateRandomMap(int xdim, int ydim)
         }
     }
 
-    // Initialisation aléatoire
+    // Initialisation des compteurs pour les types de sols
+    int crevasse_count = 0;
+    int plain_count = 0;
+    int erg_count = 0;
+    int reg_count = 0;
+    int max_crevasses = 5;
+
     srand(time(NULL));
-    int accessible = 0; // Vérifie si la carte est navigable
     for (int i = 0; i < ydim; i++) {
         for (int j = 0; j < xdim; j++) {
-            map.soils[i][j] = rand() % 4 + 1; // Valeurs aléatoires entre 1 et 4
-            map.costs[i][j] = COST_UNDEF;    // Coût par défaut
-            if (map.soils[i][j] != CREVASSE) {
-                accessible = 1; // Au moins une case accessible
-            }
-        }
-    }
+            int soil_type;
 
-    // Vérification de navigabilité
-    if (!accessible) {
-        fprintf(stderr, "Erreur : la carte générée est entièrement composée de crevasses.\n");
-        exit(1);
+            // Génération contrôlée des types de sols
+            do {
+                soil_type = rand() % 4 + 1; // Valeurs aléatoires entre 1 et 4
+                if (soil_type == CREVASSE && crevasse_count >= max_crevasses) {
+                    soil_type = PLAIN; // Forcer une plaine si trop de crevasses
+                }
+                if (plain_count >= 2 * (erg_count + reg_count)) {
+                    if (soil_type == PLAIN) soil_type = rand() % 3 + 2; // Limiter les plaines
+                }
+            } while ((soil_type == CREVASSE && crevasse_count >= max_crevasses));
+
+            // Mise à jour des compteurs
+            map.soils[i][j] = soil_type;
+            if (soil_type == CREVASSE) crevasse_count++;
+            if (soil_type == PLAIN) plain_count++;
+            if (soil_type == ERG) erg_count++;
+            if (soil_type == REG) reg_count++;
+
+            // Coût par défaut
+            map.costs[i][j] = COST_UNDEF;
+        }
     }
 
     // Placement de la base station
@@ -95,6 +110,12 @@ t_map generateRandomMap(int xdim, int ydim)
     int base_y = rand() % ydim;
     map.soils[base_y][base_x] = BASE_STATION;
     map.costs[base_y][base_x] = 0;
+
+    // Vérification de navigabilité
+    if (crevasse_count == xdim * ydim) {
+        fprintf(stderr, "Erreur : la carte générée est entièrement composée de crevasses.\n");
+        exit(1);
+    }
 
     // Calcul des coûts et suppression des faux crevasses
     calculateCosts(map);
