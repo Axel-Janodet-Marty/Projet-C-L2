@@ -348,6 +348,23 @@ void displayMap(t_map map)
             printf("\n");
         }
 
+const char* getSoilAsString(t_soil soil) {
+    switch (soil) {
+        case BASE_STATION:
+            return "Base Station";
+        case PLAIN:
+            return "Plain";
+        case ERG:
+            return "Erg";
+        case REG:
+            return "Reg";
+        case CREVASSE:
+            return "Crevasse";
+        default:
+            return "Unknown Soil";
+    }
+}
+
     }
     return;
 }
