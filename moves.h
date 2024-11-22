@@ -7,8 +7,8 @@
 
 #include "loc.h"
 
-#define NB_tab_moves 9
-#define NB_choices 5
+
+
 /**
  * @brief Array of strings for the possible moves of the robot
  */
@@ -68,5 +68,4 @@ t_move *getRandomMoves(int );
  */
 t_move* update_movesList(t_move* , int , int );
 t_move ErgMove(t_move move);
-
 #endif //UNTITLED1_MOVES_H
