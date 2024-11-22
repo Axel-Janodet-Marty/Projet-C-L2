@@ -1,50 +1,62 @@
 #include "tree.h"
 
-p_node Init_Node(int nb_sons, int depth, t_move move, t_localisation loc, t_map map, p_node node){
+p_node Init_Node(int nb_sons, int depth, t_move move, t_localisation loc, t_map map, p_node node) {
     p_node new_node;
     new_node = (t_node *)malloc(sizeof(t_node));
+
     new_node->value = map.costs[loc.pos.y][loc.pos.x];
     new_node->depth = depth;
     new_node->move = move;
     new_node->parent = node;
     new_node->nbSons = nb_sons;
-    new_node->sons = (t_node **)malloc(nb_sons*sizeof(t_node *));
-    for (int i = 0; i < nb_sons; i++)
-    {
+    new_node->sons = (t_node **)malloc(nb_sons * sizeof(t_node *));
+
+    for (int i = 0; i < nb_sons; i++) {
         new_node->sons[i] = NULL;
     }
+
+    // Initialiser le type de sol
+    new_node->soil = map.soils[loc.pos.y][loc.pos.x]; // Supposant que `map` contient un tableau `soils`
+
     return new_node;
 }
 
-p_node BuildTree(int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent){
-    
+p_node BuildTree(int NB_Moves, int depth, t_move move, t_move* tab_moves, t_localisation loc, t_map map, p_node parent) {
     if (depth > NB_choices) {
         return NULL;
-    }
-    else if (depth == NB_choices || map.costs[loc.pos.y][loc.pos.x] >= 10000 || map.costs[loc.pos.y][loc.pos.x] == 0) {
+    } else if (depth == NB_choices || map.costs[loc.pos.y][loc.pos.x] >= 10000 || map.costs[loc.pos.y][loc.pos.x] == 0) {
         NB_Moves = 0;
     }
 
     p_node node = Init_Node(NB_Moves, depth, move, loc, map, parent);
 
-    for (int i = 0; i < NB_Moves; i++) {
+    // Si MARC est sur une case de type Reg martien, limiter les mouvements à 4
+    if (node->soil == REG && NB_Moves > 4) {
+        NB_Moves = 4; // Limiter les mouvements
+    }
 
+    for (int i = 0; i < NB_Moves; i++) {
         t_localisation new_loc = loc;
-        updateLocalisation(&new_loc, tab_moves[i]);
+        t_move adapted_move = tab_moves[i];
+
+        // Adapter le mouvement en fonction du sol (par exemple pour Erg martien)
+        if (node->soil == ERG) {
+            adapted_move = ErgMove(tab_moves[i]);
+        }
+
+        updateLocalisation(&new_loc, adapted_move);
 
         if (isValidLocalisation(new_loc.pos, map.x_max, map.y_max)) {
-
             t_move* new_tab_moves = update_movesList(tab_moves, NB_Moves, i);
-            node->sons[i] = BuildTree(NB_Moves - 1, depth+1, tab_moves[i], new_tab_moves, new_loc, map, node); 
+            node->sons[i] = BuildTree(NB_Moves - 1, depth + 1, adapted_move, new_tab_moves, new_loc, map, node);
             free(new_tab_moves);
-        }
-        else{                                                                                                        
+        } else {
             node->sons[i] = NULL;
         }
     }
+
     return node;
 }
-
 
 
 int search_min(p_node node){  
@@ -171,10 +183,10 @@ void printTree(t_node *node, int *architecture, int depth) {
 
     // Affichage de la structure de l'arbre
     if (sonsPass + 1 == node->nbSons) {
-        printf("`-- %d\n", node->value);
+        printf("`-- %d  |  %s\n", node->value, getSoilAsString(node->soil));
         architecture[depth] = 0;
     } else {
-        printf("|-- %d\n", node->value);
+        printf("|-- %d  |  %s\n", node->value, getSoilAsString(node->soil));
         architecture[depth] = 1;
     }
 
