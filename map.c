@@ -74,7 +74,7 @@ t_map generateRandomMap(int xdim, int ydim) {
     int total_cells = xdim * ydim;
 
     // Calculer les quantités de chaque type de sol
-    int max_crevasses = 5;
+    int max_crevasses = total_cells * 0.05; // Max 5% de crevasses
     int crevasse_count = (total_cells > max_crevasses) ? max_crevasses : total_cells / 10; // Max 5 ou 10% des cases
     int plain_count = total_cells / 2; // 50% de plaines
     int erg_reg_count = (total_cells - plain_count - crevasse_count) / 2; // Le reste pour ergs et regs
