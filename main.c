@@ -80,7 +80,12 @@ int main() {
         switch (choice) {
             case 1: // Afficher la carte
                 printf("Sols :\n");
-                displayMap(map);
+                for (int i = 0; i < map.y_max; i++) {
+                    for (int j = 0; j < map.x_max; j++) {
+                        printf("%d ", map.soils[i][j]);
+                    }
+                    printf("\n");
+                }
                 printf("Coûts :\n");
                 for (int i = 0; i < map.y_max; i++) {
                     for (int j = 0; j < map.x_max; j++) {
@@ -88,6 +93,8 @@ int main() {
                     }
                     printf("\n");
                 }
+                printf("Représentation de la map :\n");
+                displayMap(map);
                 break;
 
             case 2: // Générer des mouvements aléatoires
