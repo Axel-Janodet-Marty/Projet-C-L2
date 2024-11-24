@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "map.h"
 
 /**
  * @brief Enum for the orientation of the robot (NORTH, EAST, SOUTH, WEST)
@@ -84,5 +85,5 @@ t_position UP(t_position);
 t_position DOWN(t_position);
 
 void checkWin(int );
-
+t_localisation inputLocalisation(t_map map);
 #endif //UNTITLED1_LOC_H
