@@ -7,8 +7,11 @@
 #include "stdbool.h"
 
 // Fonctions auxiliaires
-void afficherMenu() {
-    printf("\n--- MENU ---\n");
+void afficherMenu()
+{
+    printf("             ------");
+    printf("\n       ---> | MENU | <---\n");
+    printf("             ------\n");
     printf("1. Afficher la carte (sols et coûts)\n");
     printf("2. Générer des mouvements aléatoires\n");
     printf("3. Initialiser la localisation\n");
@@ -34,9 +37,12 @@ int main() {
     int choice;
 
     // Choix de la méthode de création de la carte
+    printf("\n");
     printf("Choisissez une méthode pour créer la carte :\n");
-    printf("1. Charger une carte depuis un fichier\n");
-    printf("2. Générer une carte aléatoire\n");
+    printf("\n");
+    printf("    1. Charger une carte depuis un fichier\n");
+    printf("    2. Générer une carte aléatoire\n");
+    printf("\n");
     printf("Votre choix : ");
     fgets(buffer, sizeof(buffer), stdin);
     sscanf(buffer, "%d", &choice);
@@ -65,6 +71,7 @@ int main() {
     }
 
     printf("\nCarte créée avec dimensions %d x %d\n", map.y_max, map.x_max);
+    printf("\n");
 
     int exit = 0;
     bool activeLoc = FALSE;
@@ -80,12 +87,8 @@ int main() {
         switch (choice) {
             case 1: // Afficher la carte
                 printf("Sols :\n");
-                for (int i = 0; i < map.y_max; i++) {
-                    for (int j = 0; j < map.x_max; j++) {
-                        printf("%d ", map.soils[i][j]);
-                    }
-                    printf("\n");
-                }
+                displayMap(map);
+                printf("\n");
                 printf("Coûts :\n");
                 for (int i = 0; i < map.y_max; i++) {
                     for (int j = 0; j < map.x_max; j++) {
@@ -93,28 +96,34 @@ int main() {
                     }
                     printf("\n");
                 }
-                printf("Représentation de la map :\n");
-                displayMap(map);
+                printf("\n");
                 break;
 
             case 2: // Générer des mouvements aléatoires
                 test = getRandomMoves(NB_tab_moves);
                 printf("[   ");
                 for (int j = 0; j < NB_tab_moves; j++) {
-                    printf("%s   ", getMoveAsString(test[j]));
+                    printf("%s  ", getMoveAsString(test[j]));
+                    if (j < 8) {
+                        printf(";  ");
+                    }
                 }
                 printf("]\n");
+                printf("\n");
                 break;
 
             case 3: // Initialiser la localisation
-                loc = inputLocalisation(map);
+                loc = loc_init(0, 0, NORTH);
                 activeLoc = TRUE;
-                printf("Coût de la case initiale : %d\n", map.costs[loc.pos.y][loc.pos.x]);
+                printf("Position initiale (%d:%d), coût de la case initiale : %d\n",
+                       loc.pos.y, loc.pos.x, map.costs[loc.pos.y][loc.pos.x]);
+                printf("\n");
                 break;
 
             case 4: // Construire l'arbre
                 if (!test || !activeLoc) {
                     printf("Générez des mouvements (2) et initialisez la localisation (3) d'abord.\n");
+                    printf("\n");
                     break;
                 }
                 start = clock();
@@ -122,6 +131,7 @@ int main() {
                 end = clock();
                 cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
                 printf("--> Temps de construction de l'arbre : %.3f sec\n", cpu_time_used);
+                printf("\n");
                 break;
 
             case 5: // Rechercher la feuille de valeur minimale
@@ -181,10 +191,6 @@ int main() {
                 break;
 
             case 9: // Étude de complexité
-                if (!test || !activeLoc) {
-                    printf("Générez des mouvements (2) et initialisez la localisation (3) d'abord.\n");
-                    break;
-                }
                 printf("--> Étude de complexité :\n");
                 for (int Nb_moves = 3; Nb_moves <= NB_tab_moves; Nb_moves++) {
                     for (int choices = 3; choices <= NB_choices; choices++) {
