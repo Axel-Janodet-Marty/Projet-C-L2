@@ -100,10 +100,9 @@ int main() {
                 break;
 
             case 3: // Initialiser la localisation
-                loc = loc_init(0, 0, NORTH);
+                loc = inputLocalisation(map);
                 activeLoc = TRUE;
-                printf("Position initiale (%d:%d), coût de la case initiale : %d\n",
-                       loc.pos.y, loc.pos.x, map.costs[loc.pos.y][loc.pos.x]);
+                printf("Coût de la case initiale : %d\n", map.costs[loc.pos.y][loc.pos.x]);
                 break;
 
             case 4: // Construire l'arbre
