@@ -175,6 +175,10 @@ int main() {
                 break;
 
             case 9: // Étude de complexité
+                if (!test || !activeLoc) {
+                    printf("Générez des mouvements (2) et initialisez la localisation (3) d'abord.\n");
+                    break;
+                }
                 printf("--> Étude de complexité :\n");
                 for (int Nb_moves = 3; Nb_moves <= NB_tab_moves; Nb_moves++) {
                     for (int choices = 3; choices <= NB_choices; choices++) {
