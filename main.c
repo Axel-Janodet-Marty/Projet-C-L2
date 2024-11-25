@@ -87,8 +87,12 @@ int main() {
         switch (choice) {
             case 1: // Afficher la carte
                 printf("Sols :\n");
-                displayMap(map);
-                printf("\n");
+                for (int i = 0; i < map.y_max; i++) {
+                    for (int j = 0; j < map.x_max; j++) {
+                        printf("%d ", map.soils[i][j]);
+                    }
+                    printf("\n");
+                }
                 printf("Coûts :\n");
                 for (int i = 0; i < map.y_max; i++) {
                     for (int j = 0; j < map.x_max; j++) {
@@ -96,7 +100,8 @@ int main() {
                     }
                     printf("\n");
                 }
-                printf("\n");
+                printf("Représentation de la map :\n");
+                displayMap(map);
                 break;
 
             case 2: // Générer des mouvements aléatoires
@@ -113,7 +118,7 @@ int main() {
                 break;
 
             case 3: // Initialiser la localisation
-                loc = loc_init(0, 0, NORTH);
+                loc = inputLocalisation(map);
                 activeLoc = TRUE;
                 printf("Position initiale (%d:%d), coût de la case initiale : %d\n",
                        loc.pos.y, loc.pos.x, map.costs[loc.pos.y][loc.pos.x]);
@@ -191,6 +196,10 @@ int main() {
                 break;
 
             case 9: // Étude de complexité
+                if (!test || !activeLoc) {
+                    printf("Générez des mouvements (2) et initialisez la localisation (3) d'abord.\n");
+                    break;
+                }
                 printf("--> Étude de complexité :\n");
                 for (int Nb_moves = 3; Nb_moves <= NB_tab_moves; Nb_moves++) {
                     for (int choices = 3; choices <= NB_choices; choices++) {
